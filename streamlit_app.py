@@ -26,9 +26,11 @@ top_airlines = airline_counts.nlargest(10)
 top_airlines_df = pd.DataFrame({"Airline": top_airlines.index, "Count": top_airlines.values})
 
 # Create a pie chart using matplotlib
-plt.pie(top_airlines_df["Count"], labels=top_airlines_df["Airline"], autopct='%1.1f%%')
-plt.title("Top 10 Most Used Airlines")
-plt.axis('equal')
+fig, ax = plt.subplots()
+ax.pie(top_airlines_df["Count"], labels=top_airlines_df["Airline"], autopct='%1.1f%%')
+ax.set_title("Top 10 Most Used Airlines")
+ax.axis('equal')
+#st.pie(top_airlines_df = pd.DataFrame({"Airline": top_airlines.index, "Count": top_airlines.values})
 st.pyplot(top_airlines_df)
 
 #Show the 10 most frequent planes with a bar chart 
@@ -52,12 +54,48 @@ top_planes = plane_counts.nlargest(10)
 # Create a new dataframe with the top 10 planes and their counts
 top_planes_df = pd.DataFrame({"Plane": top_planes.index, "Count": top_planes.values})
 
-# Create a bar chart using matplotlib
-plt.bar(top_planes_df["Plane"], top_planes_df["Count"])
-plt.xticks(rotation=90)
-plt.xlabel("Plane")
-plt.ylabel("Count")
-plt.title("Top 10 Most Used Planes")
+# Create a bar chart using matplotlib and display using Streamlit
+st.bar_chart(top_planes_df.set_index('Plane'))
+st.pyplot()
 
-st.bar_chart(top_planes_df)
+# Create a bar chart using matplotlib
+#plt.bar(top_planes_df["Plane"], top_planes_df["Count"])
+#plt.xticks(rotation=90)
+#plt.xlabel("Plane")
+#plt.ylabel("Count")
+#plt.title("Top 10 Most Used Planes")
+
+#Display an Interactive map showing the Top 20 airports in South Africa 
+# Read airports and routes files using pandas
+airports = pd.read_csv(airports_file, header=None, names=["Airport ID", "Name", "City", "Country", "IATA", "ICAO", "Latitude", "Longitude", "Altitude", "Timezone", "DST", "Tz database time zone", "Type", "Source"])
+routes = pd.read_csv(routes_file, header=None, names=["Airline", "Airline ID", "Source airport", "Source airport ID", "Destination airport", "Destination airport ID", "Codeshare", "Stops", "Equipment"])
+
+# Filter routes to only include those with a source airport in South Africa
+south_africa_routes = routes[routes["Source airport"].isin(airports[airports["Country"] == "South Africa"]["IATA"])]
+
+# Group by source airport and count the number of occurrences
+airport_counts = south_africa_routes["Source airport"].value_counts()
+
+# Create a list of the top 5, 10, and 20 airports
+top_airports = [airport_counts.nlargest(20)]
+
+# Create a folium map centered on South Africa
+south_africa_coords = [-30.5595, 22.9375]
+map = folium.Map(location=south_africa_coords, zoom_start=5)
+
+# Add markers for the top airports to the map
+for i in range(len(top_airports)):
+    for airport in top_airports[i].index:
+        airport_coords = airports.loc[airports["IATA"] == airport, ["Latitude", "Longitude"]].iloc[0].values.tolist()
+        popup_text = f"{airport}: {top_airports[i][airport]} flights"
+        marker = folium.Marker(location=airport_coords, popup=popup_text)
+        marker.add_to(map)
+
+    # Add a legend to the map
+    legend_text = f"Top {len(top_airports[i])} airports"
+    legend_html = f"<div style='font-size: 14pt'>{legend_text}</div>"
+    map.get_root().html.add_child(folium.Element(legend_html))
+
+# Display the map
+st.map
 
