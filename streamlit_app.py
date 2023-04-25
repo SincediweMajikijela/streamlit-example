@@ -10,20 +10,20 @@ st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layo
 
 # ---- READ EXCEL ----
 @st.cache
-def get_data_from_(dataset):
+def get_data_from(dataset):
     df = pd.read_file(dataset)
     return df
 
 airport='airports.dat'
-dfAirport = get_data_from_excel(airport)
+dfAirport = get_data_from(airport)
 airline='airlines.dat'
-dfAirline=get_data_from_excel(airline)
+dfAirline=get_data_from(airline)
 planes='planes.dat'
-dfPlane=get_data_from_excel(plane)
+dfPlane=get_data_from(plane)
 countries='countries.dat'
-dfCountry=get_data_from_excel(countries)
+dfCountry=get_data_from(countries)
 routes='routes.dat'
-dfRoute=get_data_from_excel(routes)
+dfRoute=get_data_from(routes)
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
