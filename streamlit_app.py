@@ -4,6 +4,58 @@ import math
 import pandas as pd
 import streamlit as st
 
+
+# emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
+st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layout="wide")
+
+# ---- READ EXCEL ----
+@st.cache
+def get_data_from_(dataset):
+    df = pd.read_file(dataset)
+    return df
+
+airport='airports.dat'
+dfAirport = get_data_from_excel(airport)
+airline='airlines.dat'
+dfAirline=get_data_from_excel(airline)
+planes='planes.dat'
+dfPlane=get_data_from_excel(plane)
+countries='countries.dat'
+dfCountry=get_data_from_excel(countries)
+routes='routes.dat'
+dfRoute=get_data_from_excel(routes)
+
+# ---- SIDEBAR ----
+st.sidebar.header("Please Filter Here:")
+country = st.sidebar.multiselect(
+    "Select the country:",
+    options=dfAirport["Name"].unique(),
+    default=dfAirport["Name"].unique()
+)
+
+plane_type = st.sidebar.multiselect(
+    "Select the plane type:",
+    options=dfPlane["Name"].unique(),
+    default=dfPlane["Name"].unique(),
+)
+
+airline_name = st.sidebar.multiselect(
+    "Select the airline:",
+    options=dfAirline["Name"].unique(),
+    default=dfAirline["Name"].unique()
+)
+
+airport_name = st.sidebar.multiselect(
+    "Select the airport:",
+    options=dfAirport["Name"].unique(),
+    default=dfAirline["Name"].unique()
+)
+
+
+# ---- MAINPAGE ----
+st.title(":bar_chart: Sales Dashboard")
+st.markdown("##")
+
 #create a pie chart that displays the 10 most utilized airlines in the world
 # Set file paths
 routes_file = "/content/drive/MyDrive/Assignment 2 /routes.dat"
