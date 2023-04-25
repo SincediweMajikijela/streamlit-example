@@ -8,22 +8,12 @@ import streamlit as st
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layout="wide")
 
-# ---- READ EXCEL ----
-@st.cache
-def get_data_from(dataset):
-    df = pd.read_file(dataset)
-    return df
-
-airport='airports.dat'
-dfAirport = get_data_from(airport)
-airline='airlines.dat'
-dfAirline=get_data_from(airline)
-planes='planes.dat'
-dfPlane=get_data_from(plane)
-countries='countries.dat'
-dfCountry=get_data_from(countries)
-routes='routes.dat'
-dfRoute=get_data_from(routes)
+# ---- READ FILES ----
+dfAirport = pd.read_file('airports.dat')
+dfAirline = pd.read_file('airliness.dat')
+dfPlane=pd.read_file('planes.dat')
+dfCountry=pd.read_file('countries.dat')
+dfRoute=pd.read_file('routes.dat')
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
