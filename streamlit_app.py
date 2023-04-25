@@ -9,11 +9,13 @@ import streamlit as st
 st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layout="wide")
 
 # ---- READ FILES ----
-dfAirport = pd.read_csv('airports.dat')
-dfAirline = pd.read_csv('airliness.dat')
-dfPlane=pd.read_csv('planes.dat')
-dfCountry=pd.read_csv('countries.dat')
-dfRoute=pd.read_csv('routes.dat')
+
+dfAirport = pd.DataFrame('airports.dat')
+dfAirline = pd.DataFrame('airliness.dat')
+dfPlane=pd.DataFrame('planes.dat')
+dfCountry=pd.DataFrame('countries.dat')
+dfRoute=pd.DataFrame('routes.dat')
+
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
