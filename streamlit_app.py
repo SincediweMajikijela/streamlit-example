@@ -9,45 +9,42 @@ import streamlit as st
 st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layout="wide")
 
 # ---- READ FILES ----
-
-dfAirport = pd.DataFrame('airports.dat')
-dfAirline = pd.DataFrame('airliness.dat')
-dfPlane=pd.DataFrame('planes.dat')
-dfCountry=pd.DataFrame('countries.dat')
-dfRoute=pd.DataFrame('routes.dat')
-
+dfairports = pd.read_csv('airports.dat')
+dfairlines = pd.read_csv('airliness.dat')
+dfplanes=pd.read_csv('planes.dat')
+dfcountries=pd.read_csv('countries.dat')
+dfroutes=pd.read_csv('routes.dat')
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
 country = st.sidebar.multiselect(
     "Select the country:",
-    options=dfAirport["Name"].unique(),
-    default=dfAirport["Name"].unique()
+    options=dfairports["Name"].unique(),
+    default=dfairports["Name"].unique()
 )
 
 plane_type = st.sidebar.multiselect(
     "Select the plane type:",
-    options=dfPlane["Name"].unique(),
-    default=dfPlane["Name"].unique(),
+    options=dfplanes["Name"].unique(),
+    default=dfplanes["Name"].unique(),
 )
 
 airline_name = st.sidebar.multiselect(
     "Select the airline:",
-    options=dfAirline["Name"].unique(),
-    default=dfAirline["Name"].unique()
+    options=dfairlines["Name"].unique(),
+    default=dfairlines["Name"].unique()
 )
 
 airport_name = st.sidebar.multiselect(
     "Select the airport:",
-    options=dfAirport["Name"].unique(),
-    default=dfAirline["Name"].unique()
+    options=dfairlines["Name"].unique(),
+    default=dfairlines["Name"].unique()
 )
 
 
 # ---- MAINPAGE ----
-st.title(":bar_chart: Sales Dashboard")
+st.title(":bar_chart: Flights Dashboard")
 st.markdown("##")
-
 #create a pie chart that displays the 10 most utilized airlines in the world
 # Set file paths
 routes_file = "/content/drive/MyDrive/Assignment 2 /routes.dat"
@@ -96,7 +93,7 @@ plane_counts = merged["Name"].value_counts()
 top_planes = plane_counts.nlargest(10)
 
 # Create a new dataframe with the top 10 planes and their counts
-top_planes_df = pd.DataFrame({"Plane": top_planes.index, "Count": top_planes.values})
+top_planes_df = pd.Dataframe({"Plane": top_planes.index, "Count": top_planes.values})
 
 # Create a bar chart using matplotlib and display using Streamlit
 st.bar_chart(top_planes_df.set_index('Plane'))
@@ -141,5 +138,5 @@ for i in range(len(top_airports)):
     map.get_root().html.add_child(folium.Element(legend_html))
 
 # Display the map
-st.map
+st.markdown(folium.Map()._repr_html_(), unsafe_allow_html=True)
 
