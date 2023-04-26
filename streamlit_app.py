@@ -3,17 +3,26 @@ import altair as alt
 import math
 import pandas as pd
 import streamlit as st
+import geopandas and Geodataframe
+from shapely.geometry import point
 
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 st.set_page_config(page_title="Flights Dashboard", page_icon=":bar_chart:", layout="wide")
-
+"""
 # ---- READ FILES ----
 dfairports = pd.read_file('airports.dat')
 dfairlines = pd.read_file('airliness.dat')
 dfplanes=pd.read_file('planes.dat')
 dfcountries=pd.read_file('countries.dat')
 dfroutes=pd.read_file('routes.dat')
+"""
+# ---- READ FILES ----
+dfairports = pd.read_csv("/content/drive/MyDrive/Assignment 2 /airports.dat")
+dfairlines = pd.read_csv("/content/drive/MyDrive/Assignment 2 /airlines.dat")
+dfplanes=pd.read_csv("/content/drive/MyDrive/Assignment 2 /planes.dat")
+dfcountries=pd.read_csv("/content/drive/MyDrive/Assignment 2 /countries.dat")
+dfroutes=pd.read_csv("/content/drive/MyDrive/Assignment 2 /routes.dat")
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
@@ -99,12 +108,6 @@ top_planes_df = pd.Dataframe({"Plane": top_planes.index, "Count": top_planes.val
 st.bar_chart(top_planes_df.set_index('Plane'))
 st.pyplot()
 
-# Create a bar chart using matplotlib
-#plt.bar(top_planes_df["Plane"], top_planes_df["Count"])
-#plt.xticks(rotation=90)
-#plt.xlabel("Plane")
-#plt.ylabel("Count")
-#plt.title("Top 10 Most Used Planes")
 
 #Display an Interactive map showing the Top 20 airports in South Africa 
 # Read airports and routes files using pandas
@@ -136,7 +139,39 @@ for i in range(len(top_airports)):
     legend_text = f"Top {len(top_airports[i])} airports"
     legend_html = f"<div style='font-size: 14pt'>{legend_text}</div>"
     map.get_root().html.add_child(folium.Element(legend_html))
+    
 
 # Display the map
 st.markdown(folium.Map()._repr_html_(), unsafe_allow_html=True)
+
+
+@st.cache
+def load_data():
+    routes = pd.read_csv(routes_file, header=None, names=["Airline", "Airline ID", "Source airport", "Source airport ID", "Destination airport", "Destination airport ID", "Codeshare", "Stops", "Equipment"])
+    airports = pd.read_csv(airports_file, header=None, names=["ID", "Name", "City", "Country", "IATA", "ICAO", "Latitude", "Longitude", "Altitude", "Timezone", "DST", "Tz database time zone", "Type", "Source"])
+    routes['Airline ID'] = routes['Airline ID'].astype(str)
+    airports['ID'] = airports['ID'].astype(str)
+    routes['Destination airport ID'] = routes['Destination airport ID'].astype(str)
+    merged = pd.merge(routes, airports, how="left", left_on="Source airport ID", right_on="ID")
+    merged = pd.merge(merged, airports, how="left", left_on="Destination airport ID", right_on="ID", suffixes=("_src", "_dest"))
+    coord_counts = merged.groupby(["Latitude_src", "Longitude_src", "Latitude_dest", "Longitude_dest"]).size().reset_index(name="count")
+    coord_counts = coord_counts.sort_values(by="count", ascending=False).head(100)
+    return airports, coord_counts
+
+airports, coord_counts = load_data()
+
+st.title("Top 100 busiest flight routes on a map")
+st.markdown("This app shows the top 100 busiest flight routes on a map.")
+
+# Create a folium map centered on the first airport in the airports dataframe
+map2 = folium.Map(location=[airports["Latitude"][0], airports["Longitude"][0]], zoom_start=3)
+
+# Iterate over each coordinate group and add a polyline to the map
+for index, row in coord_counts.iterrows():
+    src_lat, src_lon, dest_lat, dest_lon = row["Latitude_src"], row["Longitude_src"], row["Latitude_dest"], row["Longitude_dest"]
+    points = [(src_lat, src_lon), (dest_lat, dest_lon)]
+    folium.PolyLine(points, color="Red", weight=1, opacity=0.5).add_to(map2)
+
+# Display the map
+folium_static(map2)
 
