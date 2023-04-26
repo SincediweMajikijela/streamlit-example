@@ -3,7 +3,6 @@ import altair as alt
 import math
 import pandas as pd
 import streamlit as st
-from shapely.geometry import point
 
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
